@@ -6,8 +6,9 @@
 #include "Status.h"
 #include "Opcode.h"
 #include "GPS.h"
-#include "DroneController.h"
-#include "Camera.h"
+//#include "DroneController.h"
+//#include "Camera.h"
+
 static const int HQ_ID = 0;
 class MeshNode
 {
@@ -16,22 +17,26 @@ class MeshNode
 	const int _uniqueId;
 	const int _channel;
 	GPS _gps;
-	Camera camera;
-	DroneController droneConnector;
 
-	boolean validateValue(int amount);
+	//Camera camera;
+	//DroneController droneConnector;
+	bool _initComplete = false;
+	bool validateValue(int amount);
+
 public:
 	MeshNode(int channel);
 	//MeshNode(const MeshNode &node);
 	//const int getChannel();
+	Package createPackage(Data data, int dataLength, Opcode opcode, int destinationAddress);
 	void init();
 	bool isDataAvailable();
 	Status readData();
 	Status processData(Opcode opcode, char* receivedData, size_t dataLength);
-	Package createPackage(char* data, int dataSize, Opcode opcode, int destinationAddress);
+	//Package createPackage(char* data, int dataSize, Opcode opcode, int destinationAddress);
 	Status forwardPackage(Package package);
 	Status sendPackage(Package package);
 	void printPackage(Package package);
+	bool isInitComplete();
 	~MeshNode();
 };
 

@@ -1,7 +1,11 @@
 #pragma once
 #include "Serializable.h"
-#include "SerializablePOD.h"
-class GPSData : Serializable
+#include <avr/io.h>
+#include <avr/interrupt.h>
+#include <SoftwareSerial.h>
+#include <TinyGPS++.h>
+#include "Data.h"
+class GPSData : public Data
 {
 	double _latitude;
 	double _longitude;
@@ -10,7 +14,7 @@ class GPSData : Serializable
 
 public:
 	GPSData();
-	GPSData(double latitude, double longitude, u32 time) :_latitude(latitude),_longitude(longitude),_time(time){};
+	GPSData(double latitude, double longitude, u32 time, u32 date) :_latitude(latitude),_longitude(longitude),_time(time){};
 	inline const double getLatitude() { return _latitude; }
 	inline const double getLongitude() { return _longitude; }
 	inline const u32 getTime() { return _time; }
@@ -20,8 +24,8 @@ public:
 	inline void setTime(u32 time) { _time = time; }
 	inline void setDate(u32 date) { _date = date; }
 
-	virtual size_t serialize_size() const;
-	virtual void serialize(char* dataOut) const;
-	virtual void deserialize(const char* dataIn);
+	//virtual size_t serialize_size() const;
+	//virtual void serialize(char* dataOut) const;
+	//virtual void deserialize(const char* dataIn);
 	~GPSData() {};
 };

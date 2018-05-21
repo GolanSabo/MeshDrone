@@ -1,6 +1,6 @@
 #include "MeshNode.h"
 
-RF24 radio(7, 8);
+static RF24 radio(7, 8);
 
 MeshNode::MeshNode(int channel):_uniqueId(rand() % 65500), _channel(channel)
 {
@@ -22,10 +22,16 @@ void MeshNode::init() {
 	radio.openWritingPipe(WRITE_ADDRESS);//open writing pipe to address pipe 1
 	Serial.println("After open writing pipe");
 	radio.startListening();
+	_initComplete = true;
 }
 
 bool MeshNode::isDataAvailable() {
 	return radio.available();
+}
+
+bool MeshNode::isInitComplete()
+{
+	return _initComplete;
 }
 
 Status MeshNode::readData() {
@@ -38,7 +44,7 @@ Status MeshNode::readData() {
 	printPackage(package);
 	if (package.getDestinationAddress() == _uniqueId) {
 		Serial.println("Processing Data");
-		processData(package.getOpcode(), package.getData(), package.getDataLength);
+		//processData(package.getOpcode(), package.getData(), package.getDataLength);
 		
 
 	}
@@ -56,26 +62,32 @@ Status MeshNode::readData() {
 
 Status MeshNode::processData(Opcode opcode, char* receivedData, size_t dataLength) {
 	Status status(FAIL);
-	char* sendData;
+	Data sendData;
 	GPSData gpsData;
 	Package package;
 	switch (opcode) {
 	case PIC_REQUEST:
+	{
 		status = PROCESSED;
 		break;
+	}
 	case GPS_REQUEST:
+	{
 		gpsData = _gps.GetGPSData();
-		size_t dataSize = gpsData.serialize_size();
-		sendData = new char[dataSize];
-		gpsData.serialize(sendData);
+		size_t dataSize = sizeof(gpsData);
+		sendData = gpsData;
+		
 		package = createPackage(sendData, dataSize, GPS_RESPONSE, HQ_ID);
 		sendPackage(package);
 		status = PROCESSED;
 		break;
+	}
 	default:
+	{
 		int amount = atoi(receivedData);
-		if (validateValue(amount))
-			droneConnector.move(opcode, amount);
+		//if (validateValue(amount))
+			//droneConnector.move(opcode, amount);
+	}
 	}
 	if (receivedData != NULL)
 		delete[] receivedData;
@@ -89,7 +101,7 @@ boolean MeshNode::validateValue(int amount) {
 	return false;
 }
 
-Package MeshNode::createPackage(char* data, int dataLength, Opcode opcode, int destinationAddress) {
+Package MeshNode::createPackage(Data data, int dataLength, Opcode opcode, int destinationAddress) {
 	Package package;
 	package.setData(data, dataLength);
 	package.setOriginAddress(_uniqueId);

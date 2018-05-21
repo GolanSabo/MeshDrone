@@ -6,7 +6,7 @@
 //	printPackage();
 //}
 
-Package::Package(int id, int originAddress, int from, int destinationAddress, int hopTtl, int numOfHops, char* data ,int dataLength, Opcode opcode)
+Package::Package(int id, int originAddress, int from, int destinationAddress, int hopTtl, int numOfHops, Data data ,int dataLength, Opcode opcode)
 	: _id(id), _originAddress(originAddress), _from(from), _destinationAddress(destinationAddress), _hopTtl(hopTtl), _numOfHops(numOfHops),_data(data),_opcode(opcode)
 {
 	//for (int i = 0; i < dataLength; ++i) {
@@ -36,7 +36,7 @@ const int Package::getHopTtl() { return _hopTtl; }
 
 const int Package::getNumOfHops() { return _numOfHops; }
 
-/*const*/ char* Package::getData() { return _data; }
+Data Package::getData() { return _data; }
 
 
 
@@ -48,9 +48,9 @@ const int Package::getNumOfHops() { return _numOfHops; }
 //	return data;
 //}
 
-const int Package::getDataLength() { return _dataLength; }
+int Package::getDataLength() { return _dataLength; }
 
-const Opcode Package::getOpcode() { return _opcode; }
+Opcode Package::getOpcode() { return _opcode; }
 
 void Package::setOriginAddress(int originAddress) { _originAddress = originAddress; }
 
@@ -62,11 +62,13 @@ void Package::setHopTtl(int hopTtl) { _hopTtl = hopTtl; }
 
 void Package::setNumOfHops(int numOfHops) { _numOfHops = numOfHops; }
 
-void Package::setData(char* data, int dataLength) {
-	for (int i = 0; i < dataLength; ++i) {
-		_data[i] = data[i];
-	}
+void Package::setData(Data data, int dataLength) {
+	_data = data;
 	_dataLength = dataLength;
+}
+void Package::setId(int id)
+{
+	_id = id;
 }
 //void Package::setData(char* data) {
 //	_data = data;
@@ -103,6 +105,4 @@ void Package::printPackage() {
 
 Package::~Package()
 {
-	if(_data != NULL)
-		delete[] _data;
 }

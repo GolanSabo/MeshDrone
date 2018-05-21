@@ -1,68 +1,5 @@
-//#include <SPI.h>
-//#include <nRF24L01.h>
-//#include <RF24.h>
-//RF24 radio(7, 8); // CE, CSN
-//byte address[][6] = { 0 };
-//
-//struct package {
-//	int id = 1;
-//	float temprature = 18.4;
-//	char text[100] = "empty";
-//}; typedef struct package Package;
-//Package data;
-//
-//void setup() {
-//	Serial.begin(115200);
-//	bool flag = radio.begin();
-//
-//	if (flag) {
-//		delay(2000);
-//		Serial.println("RADIO IS OPEN");
-//	}
-//	else {
-//		delay(2000);
-//		Serial.println("RADIO IS NOT OPEN");
-//	}
-//	
-//	
-//	radio.setChannel(115);
-//
-//	radio.setPALevel(RF24_PA_MAX);
-//	radio.setDataRate(RF24_250KBPS);
-//	radio.openReadingPipe(1, address[0]);
-//	radio.openWritingPipe(1);//open writing pipe to address pipe 1
-//	
-//
-//	delay(1000);
-//}
-//void loop() {
-//	Serial.println("LOOP");
-//	radio.startListening();
-//	if (radio.available()) {
-//		while (radio.available()) {
-//			Serial.println("Recieved Data");
-//			radio.read(&data, sizeof(data));
-//		}
-//		
-//		Serial.print("\nPackage:");
-//		Serial.println(data.id);
-//		Serial.println(data.temprature);
-//		Serial.println(data.text);
-//		if (data.id % 2 == 0) {
-//			radio.stopListening();
-//			Serial.println("Forwarding message");
-//			data.text[10] = '!';
-//			radio.write(&data, sizeof(data));
-//			//radio.write()
-//		}
-//
-//	}
-//	else {
-//		Serial.println("No Data!");
-//	}
-//	delay(1000);
-//}
-
+#include <TinyGPS++.h>
+#include <stdio.h>
 #include <util.h>
 #include <Timer1.h>
 #include <ThrottleHold.h>
@@ -92,26 +29,51 @@
 #include <Curve.h>
 #include <Channel.h>
 #include <AIPin.h>
-#include <SoftwareSerial.h>
-#include <TinyGPS++.h>
 #include <SPI.h>
 #include <RF24_config.h>
 #include <RF24.h>
 #include <printf.h>
 #include <nRF24L01.h>
+#include <SoftwareSerial.h>
 #include "MeshNode.h"
 
-static const int CHANNEL = 116;
+
+
+
+
+static const int CHANNEL = 115;
 MeshNode node(CHANNEL);
+GPSData data(133.23, 12323.44, 3333333, 3333333);
+Package package1(1, 1, 2, 3, 0, 5, data, 5, LEFT_REQUEST);
 void setup() {
+
+	//Timers initialization
+	cli();//stop interrupts
+
+		  //set timer0 interrupt at 2kHz
+	TCCR0A = 0;// set entire TCCR0A register to 0
+	TCCR0B = 0;// same for TCCR0B
+	TCNT0 = 0;//initialize counter value to 0
+			  // set compare match register for 2khz increments
+	OCR0A = 255;// = (16*10^6) / (2000*64) - 1 (must be <256)
+				// turn on CTC mode
+	TCCR0A |= (1 << WGM01);
+	// Set CS01 and CS00 bits for 64 prescaler
+	TCCR0B |= (1 << CS01) | (1 << CS00);
+	// enable timer compare interrupt
+	TIMSK0 |= (1 << OCIE0A);
+	sei();//allow interrupts
+
+
+
 	Serial.begin(115200);
 	delay(1000);
 	node.init();
 }
 void loop() {
 	Serial.println("LOOP");
-	char charArray[] { 'a', 'v', 'w', 'g', 'c' };
-		Package package(5, 1, 2, 1, 5, 0, charArray, 5);
+	//char charArray[] { 'a', 'v', 'w', 'g', 'c' };
+	//Package package1(1, 1, 2, 3, 0, 5, charArray, 5, LEFT_REQUEST);
 		//char* j = "Message #";
 		//package.setData(j, sizeof(j));
 		//package.setDestinationAddress(1);
@@ -120,12 +82,21 @@ void loop() {
 		//package.setNumOfHops(0);
 		//package.setFrom(1);*/
 		//package.printPackage();
-		node.sendPackage(package);
+		node.sendPackage(package1);
 		delay(1000);
 	if (node.isDataAvailable()) {
 		node.readData();
 	}
 	else {
 		delay(1000);
+	}
+}
+
+ISR(TIMER0_COMPA_vect) {  //change the 0 to 1 for timer1 and 2 for timer2
+	if (node.isInitComplete()) {
+		int id = package1.getId();
+		package1.setId(++id);
+
+		node.sendPackage(package1);
 	}
 }

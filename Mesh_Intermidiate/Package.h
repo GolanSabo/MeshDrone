@@ -2,7 +2,10 @@
 #include "vector.h"
 #include "Hashtable.h"
 #include <SPI.h>
-static const int DEFAULT_HOP_TTL = 5;
+#include "GPSData.h"
+const int DEFAULT_HOP_TTL = 5;
+enum Status { FAIL, SUCCESS, PROCESSED, DROP, FORWARDED };
+enum Opcode { LEFT_REQUEST, RIGHT_REQUEST, UP_REQUEST, DOWN_REQUEST, PIC_REQUEST, PIC_RESPONSE, GPS_REQUEST, GPS_RESPONSE };
 class Package
 {
 	//The unique ID of the package
@@ -19,7 +22,7 @@ class Package
 	int _numOfHops;
 	//The data of the package
 			//Vector<char*> _data;
-	char* _data;
+	Data _data;
 	//The size of the data in bytes
 	int _dataLength;
 	//The unique value of the required operation
@@ -28,7 +31,7 @@ class Package
 	bool validateOpcode(Opcode opcode);
 public:
 	//Package(int id, int originAddress, int from, int destinationAddress, int hopTtl, int numOfHops, Vector<char*> data);
-	Package(int id, int originAddress, int from, int destinationAddress, int hopTtl, int numOfHops, char* data, int dataLength, Opcode opcode);
+	Package(int id, int originAddress, int from, int destinationAddress, int hopTtl, int numOfHops, Data data, int dataLength, Opcode opcode);
 	Package(int id);
 	Package();
 	const int getId();
@@ -37,16 +40,17 @@ public:
 	const int getDestinationAddress();
 	const int getHopTtl();
 	const int getNumOfHops();
-	char* getData();
+	Data getData();
 	//const char* getDataAsCharArray();
-	const int getDataLength();
-	const Opcode getOpcode();
+	int getDataLength();
+	Opcode getOpcode();
 	void setOriginAddress(int originAddress);
 	void setFrom(int from);
 	void setDestinationAddress(int destinationAddress);
 	void setHopTtl(int hopTtl);
 	void setNumOfHops(int numOfHops);
-	void setData(char* data, int dataLength);
+	void setData(Data data, int dataLength);
+	void setId(int id);
 	//void setData(Vector<char*> data);
 	void setOpcode(Opcode opcode);
 	void printPackage();
