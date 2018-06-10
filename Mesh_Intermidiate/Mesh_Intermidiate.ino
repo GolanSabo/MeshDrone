@@ -1,3 +1,6 @@
+#include <SimpleTimer.h>
+#include <QueueList_Modified.h>
+#include <PriorityQueue.h>
 #include <TinyGPS++.h>
 #include <stdio.h>
 #include <util.h>
@@ -36,67 +39,39 @@
 #include <nRF24L01.h>
 #include <SoftwareSerial.h>
 #include "MeshNode.h"
-
-
-
-
+#include "DroneController.h"
 
 static const int CHANNEL = 115;
 MeshNode node(CHANNEL);
-GPSData data(133.23, 12323.44, 3333333, 3333333);
-Package package1(1, 1, 2, 3, 0, 5, data, 5, LEFT_REQUEST);
+
+//Package package1(1, node.getId(), node.getId(), 4, 0, 5, &data, 5, MOVE);
+int opCode = 4;
 void setup() {
-
-	//Timers initialization
-	cli();//stop interrupts
-
-		  //set timer0 interrupt at 2kHz
-	TCCR0A = 0;// set entire TCCR0A register to 0
-	TCCR0B = 0;// same for TCCR0B
-	TCNT0 = 0;//initialize counter value to 0
-			  // set compare match register for 2khz increments
-	OCR0A = 255;// = (16*10^6) / (2000*64) - 1 (must be <256)
-				// turn on CTC mode
-	TCCR0A |= (1 << WGM01);
-	// Set CS01 and CS00 bits for 64 prescaler
-	TCCR0B |= (1 << CS01) | (1 << CS00);
-	// enable timer compare interrupt
-	TIMSK0 |= (1 << OCIE0A);
-	sei();//allow interrupts
-
-
-
 	Serial.begin(115200);
-	delay(1000);
 	node.init();
 }
+static int counter2 = 0;
 void loop() {
-	Serial.println("LOOP");
-	//char charArray[] { 'a', 'v', 'w', 'g', 'c' };
-	//Package package1(1, 1, 2, 3, 0, 5, charArray, 5, LEFT_REQUEST);
-		//char* j = "Message #";
-		//package.setData(j, sizeof(j));
-		//package.setDestinationAddress(1);
-		//package.setOriginAddress(1);
-		//package.setHopTtl(5);
-		//package.setNumOfHops(0);
-		//package.setFrom(1);*/
-		//package.printPackage();
+	MoveData d(3,1900);
+	//GPSData data("133.23,123.44,33333,33334");
+	//d.printData();
+#ifdef COM
+#if COM == 5
+	//COM 5
+
+	if (counter2 == 65535) {
+		//Serial.println(d.toString());
+		Package package1(1, node.getId(), node.getId(), 4, 0, 5, d.toString(), 5, MOVE);
 		node.sendPackage(package1);
-		delay(1000);
+		counter2 = 0;
+	}
+	counter2++;
+#endif
+#endif
+	node.runTimers();
+	node.processData(MOVE, d.toString(), 0);
 	if (node.isDataAvailable()) {
 		node.readData();
 	}
-	else {
-		delay(1000);
-	}
-}
-
-ISR(TIMER0_COMPA_vect) {  //change the 0 to 1 for timer1 and 2 for timer2
-	if (node.isInitComplete()) {
-		int id = package1.getId();
-		package1.setId(++id);
-
-		node.sendPackage(package1);
-	}
+	delay(100);
 }

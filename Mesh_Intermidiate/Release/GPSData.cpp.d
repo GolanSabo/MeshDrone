@@ -1,7 +1,6 @@
 C:\Users\golans2\AppData\Local\Temp\VMBuilds\Mesh_Intermidiate\uno\Release\GPSData.cpp.o: \
  C:\Users\golans2\AppData\Local\Temp\VMBuilds\Mesh_Intermidiate\uno\Release\GPSData.cpp \
  C:\Users\golans2\AppData\Local\Temp\VMBuilds\Mesh_Intermidiate\uno\Release\GPSData.h \
- C:\Users\golans2\AppData\Local\Temp\VMBuilds\Mesh_Intermidiate\uno\Release\Serializable.h \
  C:\Program\ Files\ (x86)\Arduino\hardware\arduino\avr\libraries\SoftwareSerial\src/SoftwareSerial.h \
  C:\Program\ Files\ (x86)\Arduino\hardware\arduino\avr\cores\arduino/Stream.h \
  C:\Program\ Files\ (x86)\Arduino\hardware\arduino\avr\cores\arduino/Print.h \
@@ -16,4 +15,6 @@ C:\Users\golans2\AppData\Local\Temp\VMBuilds\Mesh_Intermidiate\uno\Release\GPSDa
  C:\Program\ Files\ (x86)\Arduino\hardware\arduino\avr\cores\arduino/USBAPI.h \
  C:\Program\ Files\ (x86)\Arduino\hardware\arduino\avr\cores\arduino/Arduino.h \
  C:\Program\ Files\ (x86)\Arduino\hardware\arduino\avr\variants\standard/pins_arduino.h \
- C:\Users\golans2\AppData\Local\Temp\VMBuilds\Mesh_Intermidiate\uno\Release\Data.h
+ C:\Users\golans2\AppData\Local\Temp\VMBuilds\Mesh_Intermidiate\uno\Release\Data.h \
+ C:\Program\ Files\ (x86)\Arduino\hardware\arduino\avr\cores\arduino/WString.h \
+ C:\Users\golans2\AppData\Local\Temp\VMBuilds\Mesh_Intermidiate\uno\Release\Utils.h

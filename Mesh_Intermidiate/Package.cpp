@@ -1,18 +1,15 @@
 #include "Package.h"
 
-//Package::Package(int id, int originAddress, int from, int destinationAddress, int hopTtl, int numOfHops, Vector<byte> data)
-//	:_id(id),_originAddress(originAddress),_from(from),_destinationAddress(destinationAddress),_hopTtl(hopTtl),_numOfHops(numOfHops),_data(data),_dataLength(data.size())
+//Package::Package(int id, int originAddress, int from, int destinationAddress, int hopTtl, int numOfHops, Data* data ,int dataLength, Opcode opcode)
+//	: _id(id), _originAddress(originAddress), _from(from), _destinationAddress(destinationAddress), _hopTtl(hopTtl), _numOfHops(numOfHops),_data(data),_opcode(opcode)
 //{
-//	printPackage();
+//	_propagate = 5;
 //}
 
-Package::Package(int id, int originAddress, int from, int destinationAddress, int hopTtl, int numOfHops, Data data ,int dataLength, Opcode opcode)
-	: _id(id), _originAddress(originAddress), _from(from), _destinationAddress(destinationAddress), _hopTtl(hopTtl), _numOfHops(numOfHops),_data(data),_opcode(opcode)
+Package::Package(int id, int originAddress, int from, int destinationAddress, int hopTtl, int numOfHops, String data, int dataLength, Opcode opcode)
+	: _id(id), _originAddress(originAddress), _from(from), _destinationAddress(destinationAddress), _hopTtl(hopTtl), _numOfHops(numOfHops), _strData(data), _opcode(opcode)
 {
-	//for (int i = 0; i < dataLength; ++i) {
-	//	_data.push_back(data[i]);
-	//}
-	//printPackage();
+	_propagate = 5;
 }
 
 Package::Package(int id) :_hopTtl(DEFAULT_HOP_TTL), _numOfHops(0), _id(id)
@@ -36,17 +33,22 @@ const int Package::getHopTtl() { return _hopTtl; }
 
 const int Package::getNumOfHops() { return _numOfHops; }
 
-Data Package::getData() { return _data; }
+int Package::getSendPriority()
+{
+	return _sendPriority;
+}
 
+//Data* Package::getData() { return _data; }
+String Package::getData() { return _strData; }
+int Package::getPropagation()
+{
+	return _propagate;
+}
 
-
-//const char* Package::getDataAsCharArray() {
-//	char* data = new char[_dataLength];
-//	for (int i = 0; i < _dataLength; ++i) {
-//		data[i] = _data[i];
-//	}
-//	return data;
-//}
+int Package::getSendInterval()
+{
+	return _sendInterval;
+}
 
 int Package::getDataLength() { return _dataLength; }
 
@@ -62,22 +64,44 @@ void Package::setHopTtl(int hopTtl) { _hopTtl = hopTtl; }
 
 void Package::setNumOfHops(int numOfHops) { _numOfHops = numOfHops; }
 
-void Package::setData(Data data, int dataLength) {
-	_data = data;
-	_dataLength = dataLength;
+//void Package::setData(Data* data, int dataLength) {
+//	_data = data;
+//	_dataLength = dataLength;
+//}
+void Package::setData(String data) {
+	_strData = data;
+	
 }
 void Package::setId(int id)
 {
 	_id = id;
 }
-//void Package::setData(char* data) {
-//	_data = data;
-//	_dataLength = _data.size();
+
+//void Package::setSendPriority(SEND_INTERVAL priority)
+//{
+//	switch (priority) {
+//	case SEND_INTERVAL_LOW:
+//		_sendInterval = SEND_INTERVAL_LOW;
+//		break;
+//	case SEND_INTERVAL_MEDIUM:
+//		_sendInterval = ;
+//	case SEND_INTERVAL_HIGH:
+//	}
 //}
 
 void Package::setOpcode(Opcode opcode) {
 	if (validateOpcode(opcode))
 		_opcode = opcode;
+}
+
+void Package::setSendInterval(int sendInterval)
+{
+	_sendInterval = sendInterval;
+}
+
+void Package::setPropagation(int propagation)
+{
+	_propagate = propagation;
 }
 
 bool Package::validateOpcode(Opcode opcode) {
@@ -100,7 +124,25 @@ void Package::printPackage() {
 	Serial.print("NumOfHops : ");
 	Serial.println(_numOfHops);
 	Serial.print("Data : ");
-	//Serial.println(getDataAsCharArray());
+	//_data->printData();
+	//////Test!! Don't forget to remove
+	//GPSData*gpsData = static_cast<GPSData*>(_data);
+	//Serial.print("Longitude : ");
+	//Serial.println((*gpsData).getLongitude());
+	//Serial.print("Latitude : ");
+	//Serial.println((*gpsData).getLatitude());
+	//Serial.print("Time : ");
+	//Serial.println((*gpsData).getTime());
+	//Serial.print("Date : ");
+	//Serial.println((*gpsData).getDate());
+
+
+	//MoveData* moveData = static_cast<MoveData*>(_data);
+	//Serial.print("Direction : ");
+	//Serial.println((*moveData).getDirection());
+	//Serial.print("amount: ");
+	//Serial.println((*moveData).getAmount());
+
 }
 
 Package::~Package()

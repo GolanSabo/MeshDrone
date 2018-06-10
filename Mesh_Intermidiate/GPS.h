@@ -9,6 +9,7 @@ https://en.wikipedia.org/wiki/Pulse-position_modulation ppm calc explain
 #include <SoftwareSerial.h>
 #include <TinyGPS++.h>
 #include "GPSData.h"
+#include "Package.h"
 
 class GPS
 {
@@ -18,7 +19,7 @@ class GPS
 
 public:
 	GPS();
-	const GPSData GetGPSData();
+	const Status GetGPSData(GPSData& gpsData);
 	~GPS();
 };
 
